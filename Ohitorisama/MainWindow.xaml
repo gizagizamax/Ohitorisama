@@ -1,0 +1,198 @@
+﻿<Window x:Class="Ohitorisama.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Ohitorisama"
+        mc:Ignorable="d"
+        Title="おひとり様" Height="450" Width="673" Closing="Window_Closing">
+    <StackPanel>
+        <StackPanel>
+            <TabControl>
+                <TabItem Header="キーボード">
+                    <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="キーボード設定" FontWeight="Bold"/>
+                            <Label Content="状態："/>
+                            <Label Content="NG" x:Name="lblKeyboardStatus"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <RadioButton x:Name="rdoKeyboardTrigger" Content="ON" Margin="5,5,5,0" Checked="rdoKeyboardTrigger_Checked"/>
+                            <RadioButton Content="OFF" Margin="5,5,5,0" IsChecked="True"/>
+                            <Label Content="使わない時はOFFにしておくことで、予期せぬタイミングで会話してしまうのを防げます。" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,5">
+                            <Label Content="Whisperの起動を忘れないようにしてください。" Margin="5,0,5,0"/>
+                            <Label Content="ONにするとVTubeStudioに接続します。" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="キーボード" Margin="5,0,5,0"/>
+                            <ComboBox x:Name="cmbKeyboardTrigger" Width="150" Margin="5,0,5,0" SelectionChanged="cmbKeyboardTrigger_SelectionChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,5">
+                            <Label Content="このキーを押してる間、録音されます。" Margin="5,0,5,0" FontSize="11"/>
+                            <Label Content="録音した音声を使ってAIと会話をします。" Margin="5,0,5,0" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="マイク">
+                    <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="マイク設定" FontWeight="Bold"/>
+                            <Label Content="状態："/>
+                            <Label Content="NG" x:Name="lblMicStatus"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Button x:Name="btnRecordDevice" Content="マイク一覧更新" Click="btnRecordDevice_Click" HorizontalAlignment="Left" Width="100" Margin="5,0,5,0"/>
+                            <ComboBox x:Name="cmbRecordDevice" Width="200" Margin="5,0,5,0" SelectionChanged="cmbRecordDevice_SelectionChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Label Content="録音ファイルパス" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtMicRecordPath" Width="500" Margin="5,0,5,0" TextChanged="txtMicRecordPath_TextChanged"/>
+                            <Button x:Name="btnMicRecordPath" Content="..." Click="btnMicRecordPath_Click" Width="40" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                            <Label Content="音声認識のために一時的にファイルに出力します。" Margin="5,0,5,0" FontSize="11"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5">
+                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                            <Label Content="マイクテスト" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Button x:Name="btnMicRecordStart" Content="録音START" Click="btnMicRecordStart_Click" Width="100" Margin="5,0,5,0"/>
+                            <Button x:Name="btnMicRecordEnd" Content="録音STOP" Click="btnMicRecordEnd_Click" Width="100" Margin="5,0,5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="Whisper">
+                    <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="Whisper(音声認識)設定" FontWeight="Bold"/>
+                            <Label Content="状態："/>
+                            <Label Content="NG" x:Name="lblWhisperStatus"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="localhostのポート" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtWhisperPort" Width="50" Margin="5,0,5,0" TextChanged="txtWhisperPort_TextChanged"/>
+                            <Label Content="モデル" Margin="5,0,5,0"/>
+                            <ComboBox x:Name="cmbWhisperModel" Width="100" Margin="5,0,0,0" SelectionChanged="cmbWhisperModel_SelectionChanged">
+                                <ComboBoxItem Content="tiny"/>
+                                <ComboBoxItem Content="base"/>
+                                <ComboBoxItem Content="small"/>
+                                <ComboBoxItem Content="medium"/>
+                                <ComboBoxItem Content="large"/>
+                            </ComboBox>
+                            <Label Content="Whisper起動後にモデルを変えた場合、モデルリロードをしてください。"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Button x:Name="btnWhisperStart" Content="Whisper起動" Click="btnWhisperStart_Click" HorizontalAlignment="Left" Width="100" Margin="5,0,5,0"/>
+                            <Button x:Name="btnWhisperReload" Content="モデルリロード" Click="btnWhisperReload_Click" HorizontalAlignment="Left" Width="100" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5">
+                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                            <Label Content="Whisperテスト" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Button x:Name="btnWhisperTranscribe" Content="音声認識" Click="btnWhisperTranscribe_Click" Width="100" Margin="5,0,5,0"/>
+                            <Label Content="マイクで録音した音声を解析し、文字に起こします。" Margin="5,0,5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="ChatGPT">
+                    <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="ChatGPT設定" FontWeight="Bold"/>
+                            <Label Content="状態："/>
+                            <Label Content="NG" x:Name="lblChatGptStatus"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="モデル" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptModel" Width="150" Margin="5,0,0,0" TextChanged="txtChatGptModel_TextChanged"/>
+                            <Label Content="デフォルト値&quot;text-davinci-003&quot;" Margin="0,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="total_token" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptTotalToken" Width="50" Margin="5,0,0,0" TextChanged="txtChatGptTotalToken_TextChanged"/>
+                            <Label Content="&quot;text-davinci-003&quot;の場合4000、&quot;text-curie-001&quot;, &quot;text-babbage-001&quot;, &quot;text-ada-001&quot;の場合2048" Margin="0,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="max__tokens" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptMaxTokens" Width="50" Margin="5,0,10,0" TextChanged="txtChatGptMaxTokens_TextChanged"/>
+                            <Label Content="temperature" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptTemperature" Width="50" Margin="5,0,5,0" TextChanged="txtChatGptTemperature_TextChanged"/>
+                            <Label Content="APIキー" Margin="5,0,5,0"/>
+                            <PasswordBox x:Name="txtChatGptApiKey" Width="200" Margin="5,0,5,0" PasswordChanged="txtChatGptApiKey_PasswordChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0">
+                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                            <Label Content="ChatGPTテスト" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <TextBox x:Name="txtChatGptText" Width="400" Margin="5,0,5,0"/>
+                            <Button x:Name="btnChatGptCompletion" Content="ChatGPT実行" Click="btnChatGptCompletion_Click" Width="100" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="AIにメッセージを送ります" Margin="5,0,5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="VOICEVOX">
+                    <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="VOICEVOX設定" FontWeight="Bold"/>
+                            <Label Content="状態："/>
+                            <Label Content="NG" x:Name="lblVoiceVoxStatus"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="ポート" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtVoiceVoxPort" Width="50" Margin="5,0,0,0" TextChanged="txtVoiceVoxPort_TextChanged"/>
+                            <Label Content="話者" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtVoiceVoxSpeaker" Width="50" Margin="5,0,0,0" TextChanged="txtVoiceVoxSpeaker_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0">
+                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                            <Label Content="VOICEVOXテスト" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <TextBox x:Name="txtVoiceVoxText" Width="400" Margin="5,0,5,0"/>
+                            <Button x:Name="btnVoiceVoxSpeek" Content="話す" Click="btnVoiceVoxSpeek_Click" Width="100" Margin="5,0,5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="VTubeStudio">
+                    <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                            <Label Content="VTubeStudio設定" FontWeight="Bold"/>
+                            <Label Content="状態："/>
+                            <Label Content="NG" x:Name="lblVTubeStudioStatus"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <RadioButton x:Name="rdoVTubeStudioOn" Content="ON" Margin="5,5,5,0" Checked="rdoVTubeStudioOn_Checked" Unchecked="rdoVTubeStudioOn_Unchecked"/>
+                            <RadioButton Content="OFF" Margin="5,5,5,0" IsChecked="True"/>
+                            <Label Content="VTubeStudioに連携し、会話にあったモーションの実行を行います(判定はAI任せです)。" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="ポート" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtVTubeStudioPort" Width="50" Margin="5,0,0,0" TextChanged="txtVTubeStudioPort_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="「平常心」という名前で表情リセットモーションを作っておくと、表情を変える時にリセットされます。" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0">
+                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                            <Label Content="VTubeStudioテスト" Margin="5,0,5,0"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Button x:Name="btnVTubeStudioMotion" Content="全モーション実行" Click="btnVTubeStudioMotion_Click" Width="100" Margin="5,0,5,0"/>
+                        </StackPanel>
+                    </StackPanel>
+                </TabItem>
+            </TabControl>
+        </StackPanel>
+        
+        <StackPanel Margin="0,5,0,5">
+            <TextBox x:Name="txtLog" VerticalScrollBarVisibility="Visible" Height="171" AcceptsReturn="True" IsUndoEnabled="False" HorizontalScrollBarVisibility="Visible"/>
+        </StackPanel>
+
+    </StackPanel>
+</Window>

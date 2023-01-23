@@ -1,0 +1,160 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="VtsPlugin.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="VTubeStudio\VtsPlugin.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NAudio" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="OhiViewer\OhiChatGpt.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiChatGpt.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiChatGpt.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiWhisper.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiWhisper.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiWhisper.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\bin\ffplay.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\bootstrap.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\default.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\developer.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\faq.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\fate.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-all.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-bitstream-filters.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-codecs.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-devices.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-filters.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-formats.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-protocols.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-resampler.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-scaler.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-utils.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffplay-all.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffplay.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffprobe-all.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffprobe.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\general.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\git-howto.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavcodec.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavdevice.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavfilter.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavformat.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavutil.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libswresample.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libswscale.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\mailing-list-faq.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\nut.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\platform.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\style.min.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ohiWhisper.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiWhisper\ohiWhisper.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
