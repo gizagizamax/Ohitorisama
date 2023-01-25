@@ -47,7 +47,7 @@ namespace Ohitorisama
 
             foreach (ComboBoxItem item in cmbWhisperModel.Items)
             {
-                if (ohiLogic.config.WhisperModel == (string)item.Content)
+                if (ohiLogic.config.VoiceTextWhisperModel == (string)item.Content)
                 {
                     item.IsSelected = true;
                     break;
@@ -59,13 +59,26 @@ namespace Ohitorisama
                 cmbWhisperModel.SelectedIndex = 0;
             }
 
-            if (!int.TryParse(ohiLogic.config.WhisperPort, out var whisperPort))
+            if (ohiLogic.config.VoiceTextType == "Whisper")
             {
-                txtWhisperPort.Text = "50023";
+                rdoVoiceTextWhisper.IsChecked = true;
+            }
+            else if (ohiLogic.config.VoiceTextType == "ReazonSpeech")
+            {
+                rdoVoiceTextReazonSpeech.IsChecked = true;
             }
             else
             {
-                txtWhisperPort.Text = ohiLogic.config.WhisperPort;
+                rdoVoiceTextWhisper.IsChecked = true;
+            }
+
+            if (!int.TryParse(ohiLogic.config.VoiceTextPort, out var voiceTextPort))
+            {
+                txtVoiceTextPort.Text = "50023";
+            }
+            else
+            {
+                txtVoiceTextPort.Text = ohiLogic.config.VoiceTextPort;
             }
 
             if (string.IsNullOrEmpty(ohiLogic.config.ChatGptModel))
@@ -332,12 +345,38 @@ namespace Ohitorisama
                 WriteLog(ex.Message);
             }
         }
-        // Whisper
-        void txtWhisperPort_TextChanged(object sender, TextChangedEventArgs e)
+        // VoiceText
+        private void rdoVoiceTextWhisper_Checked(object sender, RoutedEventArgs e)
         {
             try
             {
-                ohiLogic.config.WhisperPort = txtWhisperPort.Text;
+                ohiLogic.config.VoiceTextType = "Whisper";
+                ohiLogic.writeConfig();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+
+        private void rdoVoiceTextReazonSpeech_Checked(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config.VoiceTextType = "ReazonSpeech";
+                ohiLogic.writeConfig();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+
+        void txtVoiceTextPort_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config.VoiceTextPort = txtVoiceTextPort.Text;
                 ohiLogic.writeConfig();
                 lblWhisperStatus.Content = ohiLogic.whisperCheck();
             }
@@ -346,33 +385,34 @@ namespace Ohitorisama
                 WriteLog(ex.Message);
             }
         }
-        void btnWhisperStart_Click(object sender, RoutedEventArgs e)
+        void btnVoiceTextStart_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ohiLogic.whisperStart();
+                ohiLogic.voiceTextStart();
             }
             catch (Exception ex)
             {
                 WriteLog(ex.Message);
             }
         }
-        void btnWhisperReload_Click(object sender, RoutedEventArgs e)
+        void btnVoiceTextReload_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                ohiLogic.whisperReload();
+                ohiLogic.voiceTextReload();
             }
             catch (Exception ex)
             {
                 WriteLog(ex.Message);
             }
         }
+        // VoiceText - Whisper
         void cmbWhisperModel_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             try
             {
-                ohiLogic.config.WhisperModel = (string)((ComboBoxItem)cmbWhisperModel.SelectedItem).Content;
+                ohiLogic.config.VoiceTextWhisperModel = (string)((ComboBoxItem)cmbWhisperModel.SelectedItem).Content;
                 ohiLogic.writeConfig();
                 lblWhisperStatus.Content = ohiLogic.whisperCheck();
             }
@@ -386,6 +426,18 @@ namespace Ohitorisama
             try
             {
                 await ohiLogic.whisperTranscribe();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        // VoiceText - ReazonSpeech
+        async void btnReazonSpeechTest_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                await ohiLogic.reazonSpeechLoad();
             }
             catch (Exception ex)
             {

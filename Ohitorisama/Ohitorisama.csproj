@@ -29,130 +29,130 @@
     <None Update="OhiViewer\OhiChatGpt.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiViewer\OhiWhisper.css">
+    <None Update="OhiViewer\OhiVoiceText.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiViewer\OhiWhisper.html">
+    <None Update="OhiViewer\OhiVoiceText.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiViewer\OhiWhisper.js">
+    <None Update="OhiViewer\OhiVoiceText.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\bin\ffplay.exe">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\bin\ffplay.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\bootstrap.min.css">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\bootstrap.min.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\default.css">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\default.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\developer.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\developer.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\faq.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\faq.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\fate.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\fate.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-all.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-all.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-bitstream-filters.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-bitstream-filters.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-codecs.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-codecs.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-devices.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-devices.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-filters.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-filters.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-formats.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-formats.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-protocols.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-protocols.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-resampler.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-resampler.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-scaler.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-scaler.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-utils.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg-utils.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffmpeg.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffmpeg.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffplay-all.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffplay-all.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffplay.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffplay.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffprobe-all.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffprobe-all.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\ffprobe.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\ffprobe.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\general.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\general.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\git-howto.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\git-howto.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavcodec.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libavcodec.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavdevice.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libavdevice.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavfilter.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libavfilter.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavformat.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libavformat.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libavutil.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libavutil.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libswresample.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libswresample.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\libswscale.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\libswscale.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\mailing-list-faq.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\mailing-list-faq.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\nut.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\nut.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\platform.html">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\platform.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\doc\style.min.css">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\doc\style.min.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ffmpeg-master-latest-win64-gpl\LICENSE.txt">
+    <None Update="OhiVoiceText\ffmpeg-master-latest-win64-gpl\LICENSE.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ohiWhisper.bat">
+    <None Update="OhiVoiceText\ohiVoiceText.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="OhiWhisper\ohiWhisper.py">
+    <None Update="OhiVoiceText\ohiVoiceText.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

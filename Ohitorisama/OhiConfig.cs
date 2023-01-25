@@ -7,8 +7,9 @@ namespace Ohitorisama
         public string KeyboardTrigger { get; set; }
         public string MicProductName { get; set; }
         public string MicRecordPath { get; set; }
-        public string WhisperPort { get; set; }
-        public string WhisperModel { get; set; }
+        public string VoiceTextType { get; set; }
+        public string VoiceTextPort { get; set; }
+        public string VoiceTextWhisperModel { get; set; }
         public string ChatGptModel { get; set; }
         public string ChatGptTotalToken { get; set; }
         public string ChatGptMaxTokens { get; set; }

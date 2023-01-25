@@ -1,7 +1,7 @@
 let lastTime = 0;
 
 const updateLog = () => {
-  fetch("./OhiWhisper.json",{cache: "no-store"})
+  fetch("./OhiVoiceText.json",{cache: "no-store"})
     .then((response) => {
       if (!response.ok) {
         setTimeout(updateLog, 100);

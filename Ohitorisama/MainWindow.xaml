@@ -22,7 +22,7 @@
                             <Label Content="使わない時はOFFにしておくことで、予期せぬタイミングで会話してしまうのを防げます。" Margin="5,0,5,0"/>
                         </StackPanel>
                         <StackPanel Margin="0,0,0,5">
-                            <Label Content="Whisperの起動を忘れないようにしてください。" Margin="5,0,5,0"/>
+                            <Label Content="音声認識サーバーの起動を忘れないようにしてください。" Margin="5,0,5,0"/>
                             <Label Content="ONにするとVTubeStudioに接続します。" Margin="5,0,5,0"/>
                         </StackPanel>
                         <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
@@ -64,37 +64,69 @@
                         </StackPanel>
                     </StackPanel>
                 </TabItem>
-                <TabItem Header="Whisper">
+                <TabItem Header="音声認識">
                     <StackPanel Margin="0,5,0,5">
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <RadioButton x:Name="rdoVoiceTextWhisper" Content="Whisper" Margin="5,5,5,0" Checked="rdoVoiceTextWhisper_Checked"/>
+                            <RadioButton x:Name="rdoVoiceTextReazonSpeech" Content="ReazonSpeech" Margin="5,5,5,0" Checked="rdoVoiceTextReazonSpeech_Checked"/>
+                            <Label Content="音声認識で使うライブラリを選択してください。精度や使用するメモリが違います。" Margin="5,0,5,0"/>
+                        </StackPanel>
                         <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
-                            <Label Content="Whisper(音声認識)設定" FontWeight="Bold"/>
-                            <Label Content="状態："/>
-                            <Label Content="NG" x:Name="lblWhisperStatus"/>
-                        </StackPanel>
-                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
                             <Label Content="localhostのポート" Margin="5,0,5,0"/>
-                            <TextBox x:Name="txtWhisperPort" Width="50" Margin="5,0,5,0" TextChanged="txtWhisperPort_TextChanged"/>
-                            <Label Content="モデル" Margin="5,0,5,0"/>
-                            <ComboBox x:Name="cmbWhisperModel" Width="100" Margin="5,0,0,0" SelectionChanged="cmbWhisperModel_SelectionChanged">
-                                <ComboBoxItem Content="tiny"/>
-                                <ComboBoxItem Content="base"/>
-                                <ComboBoxItem Content="small"/>
-                                <ComboBoxItem Content="medium"/>
-                                <ComboBoxItem Content="large"/>
-                            </ComboBox>
-                            <Label Content="Whisper起動後にモデルを変えた場合、モデルリロードをしてください。"/>
+                            <TextBox x:Name="txtVoiceTextPort" Width="50" Margin="5,0,5,0" TextChanged="txtVoiceTextPort_TextChanged"/>
                         </StackPanel>
                         <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
-                            <Button x:Name="btnWhisperStart" Content="Whisper起動" Click="btnWhisperStart_Click" HorizontalAlignment="Left" Width="100" Margin="5,0,5,0"/>
-                            <Button x:Name="btnWhisperReload" Content="モデルリロード" Click="btnWhisperReload_Click" HorizontalAlignment="Left" Width="100" Margin="5,0,5,0"/>
+                            <Button x:Name="btnVoiceTextStart" Content="音声認識サーバー起動" Click="btnVoiceTextStart_Click" HorizontalAlignment="Left" Width="150" Margin="5,0,5,0"/>
+                            <Button x:Name="btnVoiceTextReload" Content="音声認識サーバー再起動" Click="btnVoiceTextReload_Click" HorizontalAlignment="Left" Width="150" Margin="5,0,5,0"/>
                         </StackPanel>
                         <StackPanel Margin="0,5,0,5">
-                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
-                            <Label Content="Whisperテスト" Margin="5,0,5,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
-                            <Button x:Name="btnWhisperTranscribe" Content="音声認識" Click="btnWhisperTranscribe_Click" Width="100" Margin="5,0,5,0"/>
-                            <Label Content="マイクで録音した音声を解析し、文字に起こします。" Margin="5,0,5,0"/>
+                            <TabControl>
+                                <TabItem Header="Whisper">
+                                    <StackPanel Margin="0,5,0,5">
+                                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                                            <Label Content="Whisper(音声認識)設定" FontWeight="Bold"/>
+                                            <Label Content="状態："/>
+                                            <Label Content="NG" x:Name="lblWhisperStatus"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                                            <Label Content="モデル" Margin="5,0,5,0"/>
+                                            <ComboBox x:Name="cmbWhisperModel" Width="100" Margin="5,0,0,0" SelectionChanged="cmbWhisperModel_SelectionChanged">
+                                                <ComboBoxItem Content="tiny"/>
+                                                <ComboBoxItem Content="base"/>
+                                                <ComboBoxItem Content="small"/>
+                                                <ComboBoxItem Content="medium"/>
+                                                <ComboBoxItem Content="large"/>
+                                            </ComboBox>
+                                            <Label Content="音声認識サーバー起動後にモデルを変えた場合、音声認識サーバー再起動をしてください。"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="0,5,0,5">
+                                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                                            <Label Content="Whisperテスト" Margin="5,0,5,0"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                            <Button x:Name="btnWhisperTranscribe" Content="音声認識" Click="btnWhisperTranscribe_Click" Width="100" Margin="5,0,5,0"/>
+                                            <Label Content="マイクで録音した音声を解析し、文字に起こします。" Margin="5,0,5,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                                <TabItem Header="ReazonSpeech">
+                                    <StackPanel Margin="0,5,0,5">
+                                        <StackPanel Margin="0,0,0,0" Orientation="Horizontal">
+                                            <Label Content="ReazonSpeech(音声認識)設定" FontWeight="Bold"/>
+                                            <Label Content="状態："/>
+                                            <Label Content="OK" x:Name="lblReazonSpeechStatus"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="0,5,0,5">
+                                            <Border BorderBrush="Black" BorderThickness="1" Height="1"/>
+                                            <Label Content="ReazonSpeechテスト" Margin="5,0,5,0"/>
+                                        </StackPanel>
+                                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                                            <Button x:Name="btnReazonSpeechTest" Content="音声認識" Click="btnReazonSpeechTest_Click" Width="100" Margin="5,0,5,0"/>
+                                            <Label Content="マイクで録音した音声を解析し、文字に起こします。" Margin="5,0,5,0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </TabItem>
+                            </TabControl>
                         </StackPanel>
                     </StackPanel>
                 </TabItem>

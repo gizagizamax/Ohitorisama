@@ -199,37 +199,38 @@ namespace Ohitorisama
         // Whisper
         public string whisperCheck()
         {
-            if (!int.TryParse(config.WhisperPort, out var whisperPort))
+            if (!int.TryParse(config.VoiceTextPort, out var whisperPort))
             {
                 return "localhostのポートに数字を入力してください";
             }
             return "OK";
         }
-        public void whisperStart()
+        public void voiceTextStart()
         {
             var p = new Process();
-            p.StartInfo.FileName = @".\OhiWhisper\OhiWhisper.bat";
-            p.StartInfo.ArgumentList.Add(config.WhisperPort);
-            p.StartInfo.ArgumentList.Add(config.WhisperModel);
+            p.StartInfo.FileName = @".\OhiVoiceText\OhiVoiceText.bat";
+            p.StartInfo.ArgumentList.Add(config.VoiceTextPort);
+            p.StartInfo.ArgumentList.Add(config.VoiceTextType);
+            p.StartInfo.ArgumentList.Add(config.VoiceTextWhisperModel);
             p.Start();
         }
-        public async void whisperReload()
+        public async void voiceTextReload()
         {
-            mainWindow.WriteLog("whisper reload start.");
+            mainWindow.WriteLog("voiceText server reload start.");
 
             var data = new Dictionary<string, string>();
-            data.Add("model", config.WhisperModel);
+            data.Add("model", config.VoiceTextWhisperModel);
 
-            var response = await httpClient.GetAsync($"http://localhost:{config.WhisperPort}/reload?{await new FormUrlEncodedContent(data).ReadAsStringAsync()}");
+            var response = await httpClient.GetAsync($"http://localhost:{config.VoiceTextPort}/reload?{await new FormUrlEncodedContent(data).ReadAsStringAsync()}");
             mainWindow.WriteLog(string.Format("{0}", response));
             response.EnsureSuccessStatusCode();
             var strJson = await response.Content.ReadAsStringAsync();
 
-            mainWindow.WriteLog("whisper exit." + strJson);
+            mainWindow.WriteLog("voiceText server exit." + strJson);
 
-            whisperStart();
+            voiceTextStart();
 
-            mainWindow.WriteLog("whisper reload success." + strJson);
+            mainWindow.WriteLog("voiceText server reload success." + strJson);
         }
         public async Task<string> whisperTranscribe()
         {
@@ -238,21 +239,37 @@ namespace Ohitorisama
             var whisperParam = new Dictionary<string, string>();
             whisperParam.Add("path", config.MicRecordPath);
 
-            var response = await httpClient.GetAsync($"http://localhost:{config.WhisperPort}/get_msg?{await new FormUrlEncodedContent(whisperParam).ReadAsStringAsync()}");
+            var response = await httpClient.GetAsync($"http://localhost:{config.VoiceTextPort}/get_msg?{await new FormUrlEncodedContent(whisperParam).ReadAsStringAsync()}");
             mainWindow.WriteLog(string.Format("{0}", response));
             response.EnsureSuccessStatusCode();
             var strJson = await response.Content.ReadAsStringAsync();
 
-            var whisperGetMsgRes = JsonSerializer.Deserialize<WhisperGetMsgRes>(strJson);
-            mainWindow.WriteLog($"whisper transcribe success. {whisperGetMsgRes.text}");
-            return whisperGetMsgRes.text;
+            var voiceTextGetMsgRes = JsonSerializer.Deserialize<VoiceTextGetMsgRes>(strJson);
+            mainWindow.WriteLog($"whisper transcribe success. {voiceTextGetMsgRes.text}");
+            return voiceTextGetMsgRes.text;
+        }
+        public async Task<string> reazonSpeechLoad()
+        {
+            mainWindow.WriteLog("ReazonSpeech load start.");
+
+            var reazonSpeechParam = new Dictionary<string, string>();
+            reazonSpeechParam.Add("path", config.MicRecordPath);
+
+            var response = await httpClient.GetAsync($"http://localhost:{config.VoiceTextPort}/get_msg?{await new FormUrlEncodedContent(reazonSpeechParam).ReadAsStringAsync()}");
+            mainWindow.WriteLog(string.Format("{0}", response));
+            response.EnsureSuccessStatusCode();
+            var strJson = await response.Content.ReadAsStringAsync();
+
+            var voiceTextGetMsgRes = JsonSerializer.Deserialize<VoiceTextGetMsgRes>(strJson);
+            mainWindow.WriteLog($"eazonSpeech load  success. {voiceTextGetMsgRes.text}");
+            return voiceTextGetMsgRes.text;
         }
         void saveWhisperText(string text)
         {
             var jsonData = new Dictionary<string, object>();
             jsonData.Add("time", DateTime.Now.Ticks);
             jsonData.Add("text", text);
-            var writer = new StreamWriter(@".\OhiViewer\OhiWhisper.json");
+            var writer = new StreamWriter(@".\OhiViewer\OhiVoiceText.json");
             writer.Write(JsonSerializer.Serialize(jsonData));
             writer.Close();
         }
@@ -359,7 +376,7 @@ namespace Ohitorisama
 
         void writeChatGptLog(string text)
         {
-            mainWindow.WriteLog("write whisper log start.");
+            mainWindow.WriteLog("write chatGpt log start.");
 
             var data = new Dictionary<string, object>();
             data.Add("time", DateTime.Now.Ticks);
@@ -368,7 +385,7 @@ namespace Ohitorisama
             writer.Write(JsonSerializer.Serialize(data));
             writer.Close();
 
-            mainWindow.WriteLog("write whisper log success.");
+            mainWindow.WriteLog("write chatGpt log success.");
         }
         // Voicevox
         public string voicevoxCheck()

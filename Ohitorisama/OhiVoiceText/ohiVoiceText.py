@@ -2,13 +2,13 @@ import json
 import http.server
 import urllib.parse
 import torch
-import whisper
 import time
 import sys
 import os
 
 apiPort = sys.argv[1]
-modelName = sys.argv[2]
+libType = sys.argv[2]
+modelName = sys.argv[3]
 
 # Whisperで使うため「環境変数：path」に"ffmpeg-master-latest-win64-gpl"を登録しておく
 os.environ['PATH'] = os.environ['PATH'] + ";" + os.getcwd() + '\\ffmpeg-master-latest-win64-gpl\\bin'
@@ -17,9 +17,6 @@ print("GPU(cuda)対応グラボの数:{0}".format(torch.cuda.device_count()))
 print("torchバージョン:{0}".format(torch.__version__))
 print("GPUが使える？:{0}".format(torch.cuda.is_available()))
 
-# print("whisper initializing")
-# model = whisper.load_model(modelName) # tiny, base, small, medium, large
-# print("whisper initialize success")
 class OhiHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
 
@@ -34,17 +31,22 @@ class OhiHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(json.dumps(resultBody).encode(encoding='utf_8'))
             sys.exit()
-            #print("whisper reload")
-            #self.server.model = whisper.load_model(query["model"][0]) # tiny, base, small, medium, large
-            #print("whisper reloaded")
-            #resultBody["status"] = "ok"
 
         if parsed_path.path == "/get_msg":
-            print("whisper transcribing")
-            result = self.server.model.transcribe(query["path"][0], language='japanese')
-            print(result['text'])
-            resultBody["status"] = "ok"
-            resultBody["text"] = result['text']
+            if self.server.reazonspeech != None:
+                print("reazonspeech transcribing")
+                speech, sample_rate = librosa.load(query["path"][0], sr=16000)
+                asr_results = self.server.reazonspeech(speech)
+                print(asr_results[0][0])
+                resultBody["status"] = "ok"
+                resultBody["text"] = asr_results[0][0]
+
+            elif self.server.model != None:
+                print("whisper transcribing")
+                result = self.server.model.transcribe(query["path"][0], language='japanese')
+                print(result['text'])
+                resultBody["status"] = "ok"
+                resultBody["text"] = result['text']
 
         self.send_response(200)
         self.send_header('Content-Type', 'application/json; charset=utf-8')
@@ -72,7 +74,22 @@ class OhiHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(resultBody).encode(encoding='utf_8'))
 
 with http.server.HTTPServer(('localhost', int(apiPort)), OhiHTTPRequestHandler) as server:
-    print("whisper initializing")
-    server.model = whisper.load_model(modelName)
-    print("whisper initialize success")
+    if libType == "ReazonSpeech":
+        print("ReazonSpeech initializing")
+        from espnet2.bin.asr_inference import Speech2Text
+        import librosa
+        server.model = None
+        server.reazonspeech = Speech2Text.from_pretrained(
+            "reazon-research/reazonspeech-espnet-v1",
+            beam_size=5,
+            batch_size=0,
+            device="cuda" if torch.cuda.is_available() else "cpu"
+        )
+        print("ReazonSpeech success")
+    elif libType == "Whisper":
+        import whisper
+        print("whisper initializing")
+        server.model = whisper.load_model(modelName)
+        server.reazonspeech = None
+        print("whisper initialize success")
     server.serve_forever()
