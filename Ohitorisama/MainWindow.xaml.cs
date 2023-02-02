@@ -36,7 +36,7 @@ namespace Ohitorisama
             initKeyboard();
             initRecordDevice();
 
-            if (string.IsNullOrEmpty(ohiLogic.config.MicRecordPath))
+            if (string.IsNullOrEmpty(ohiLogic.config!.MicRecordPath))
             {
                 txtMicRecordPath.Text = new FileInfo(System.Windows.Forms.Application.ExecutablePath).DirectoryName + @"\Ohitorisama.wav";
             }
@@ -81,6 +81,8 @@ namespace Ohitorisama
                 txtVoiceTextPort.Text = ohiLogic.config.VoiceTextPort;
             }
 
+            txtChatGptApiKey.Password = ohiLogic.config.ChatGptApiKey;
+
             if (string.IsNullOrEmpty(ohiLogic.config.ChatGptModel))
             {
                 txtChatGptModel.Text = "text-davinci-003";
@@ -99,15 +101,6 @@ namespace Ohitorisama
                 txtChatGptTotalToken.Text = ohiLogic.config.ChatGptTotalToken;
             }
 
-            if (!int.TryParse(ohiLogic.config.ChatGptMaxTokens, out var chatGptMaxTokens))
-            {
-                txtChatGptMaxTokens.Text = "256";
-            }
-            else
-            {
-                txtChatGptMaxTokens.Text = ohiLogic.config.ChatGptMaxTokens;
-            }
-
             if (!float.TryParse(ohiLogic.config.ChatGptTemperature, out var chatGptTemperature))
             {
                 txtChatGptTemperature.Text = "0.5";
@@ -117,7 +110,68 @@ namespace Ohitorisama
                 txtChatGptTemperature.Text = ohiLogic.config.ChatGptTemperature;
             }
 
-            txtChatGptApiKey.Password = ohiLogic.config.ChatGptApiKey;
+            if (!int.TryParse(ohiLogic.config.ChatGptMaxTokens, out var chatGptMaxTokens))
+            {
+                txtChatGptMaxTokens.Text = "60";
+            }
+            else
+            {
+                txtChatGptMaxTokens.Text = ohiLogic.config.ChatGptMaxTokens;
+            }
+
+            if (!int.TryParse(ohiLogic.config.ChatGptTopP, out var chatGptTopP))
+            {
+                txtChatGptTopP.Text = "1.0";
+            }
+            else
+            {
+                txtChatGptTopP.Text = ohiLogic.config.ChatGptTopP;
+            }
+
+            if (!int.TryParse(ohiLogic.config.ChatGptFrequencyPenalty, out var chatGptFrequencyPenalty))
+            {
+                txtChatGptFrequencyPenalty.Text = "0.5";
+            }
+            else
+            {
+                txtChatGptFrequencyPenalty.Text = ohiLogic.config.ChatGptFrequencyPenalty;
+            }
+
+            if (!int.TryParse(ohiLogic.config.ChatGptPresencePenalty, out var chatGptPresencePenalty))
+            {
+                txtChatGptPresencePenalty.Text = "0.0";
+            }
+            else
+            {
+                txtChatGptPresencePenalty.Text = ohiLogic.config.ChatGptPresencePenalty;
+            }
+
+            if (string.IsNullOrEmpty(ohiLogic.config.ChatGptMe))
+            {
+                txtChatGptPresencePenalty.Text = "You";
+            }
+            else
+            {
+                txtChatGptMe.Text = ohiLogic.config.ChatGptMe;
+            }
+
+            if (string.IsNullOrEmpty(ohiLogic.config.ChatGptAi))
+            {
+                txtChatGptAi.Text = "Friend";
+            }
+            else
+            {
+                txtChatGptAi.Text = ohiLogic.config.ChatGptAi;
+            }
+
+            if (string.IsNullOrEmpty(ohiLogic.config.ChatGptStop))
+            {
+                txtChatGptStop.Text = "You";
+            }
+            else
+            {
+                txtChatGptStop.Text = ohiLogic.config.ChatGptStop;
+            }
 
             if (!int.TryParse(ohiLogic.config.VoiceVoxPort, out var voiceVoxPort))
             {
@@ -167,10 +221,16 @@ namespace Ohitorisama
                 var keyName = ohiLogic.keysConverter.ConvertToString(keyCode);
                 if (keyName != "")
                 {
-                    cmbKeyboardTrigger.Items.Add(new OhiKeyboardTriggerItem(keyCode, keyName));
-                    if (ohiLogic.config.KeyboardTrigger == keyCode.ToString())
+                    cmbKeyboardTrigger.Items.Add(new OhiKeyboardTriggerItem(keyCode, keyName!));
+                    if (ohiLogic.config!.KeyboardTrigger == keyCode.ToString())
                     {
                         cmbKeyboardTrigger.SelectedIndex = cmbKeyboardTrigger.Items.Count - 1;
+                    }
+
+                    cmbKeyboardSkip.Items.Add(new OhiKeyboardTriggerItem(keyCode, keyName!));
+                    if (ohiLogic.config!.KeyboardSkip == keyCode.ToString())
+                    {
+                        cmbKeyboardSkip.SelectedIndex = cmbKeyboardSkip.Items.Count - 1;
                     }
                 }
             }
@@ -190,7 +250,20 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.KeyboardTrigger = ((OhiKeyboardTriggerItem)cmbKeyboardTrigger.SelectedItem).keyCode.ToString();
+                ohiLogic.config!.KeyboardTrigger = ((OhiKeyboardTriggerItem)cmbKeyboardTrigger.SelectedItem).keyCode.ToString();
+                ohiLogic.writeConfig();
+                lblKeyboardStatus.Content = ohiLogic.keyboardCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        void cmbKeyboardSkip_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.KeyboardSkip = ((OhiKeyboardTriggerItem)cmbKeyboardSkip.SelectedItem).keyCode.ToString();
                 ohiLogic.writeConfig();
                 lblKeyboardStatus.Content = ohiLogic.keyboardCheck();
             }
@@ -240,11 +313,11 @@ namespace Ohitorisama
             {
                 if (cmbRecordDevice.SelectedItem == null)
                 {
-                    ohiLogic.config.MicProductName = null;
+                    ohiLogic.config!.MicProductName = null;
                 }
                 else
                 {
-                    ohiLogic.config.MicProductName = ((OhiComboItem)cmbRecordDevice.SelectedItem).val.ProductName;
+                    ohiLogic.config!.MicProductName = ((OhiComboItem)cmbRecordDevice.SelectedItem).val.ProductName;
                 }
                 ohiLogic.writeConfig();
                 lblMicStatus.Content = ohiLogic.mickCheck();
@@ -258,7 +331,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.MicRecordPath = ((System.Windows.Controls.TextBox)sender).Text;
+                ohiLogic.config!.MicRecordPath = ((System.Windows.Controls.TextBox)sender).Text;
                 ohiLogic.writeConfig();
                 lblMicStatus.Content = ohiLogic.mickCheck();
             }
@@ -275,7 +348,7 @@ namespace Ohitorisama
                 FileInfo micRecordFile;
                 try
                 {
-                    micRecordFile = new FileInfo(ohiLogic.config.MicRecordPath);
+                    micRecordFile = new FileInfo(ohiLogic!.config!.MicRecordPath!);
                 }
                 catch (ArgumentException)
                 {
@@ -286,7 +359,7 @@ namespace Ohitorisama
                 dialog.Filter = "WAVファイル(*.wav)|*.wav";
                 if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    ohiLogic.config.MicRecordPath = dialog.FileName;
+                    ohiLogic.config!.MicRecordPath = dialog.FileName;
                 }
                 ohiLogic.writeConfig();
                 lblMicStatus.Content = ohiLogic.mickCheck();
@@ -298,7 +371,7 @@ namespace Ohitorisama
         }
         void initRecordDevice()
         {
-            var selectedName = ohiLogic.config.MicProductName;
+            var selectedName = ohiLogic.config!.MicProductName;
             cmbRecordDevice.Items.Clear(); // Configもクリアされる
 
             for (var i = 0; i < WaveInEvent.DeviceCount; i++)
@@ -350,7 +423,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VoiceTextType = "Whisper";
+                ohiLogic.config!.VoiceTextType = "Whisper";
                 ohiLogic.writeConfig();
             }
             catch (Exception ex)
@@ -363,7 +436,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VoiceTextType = "ReazonSpeech";
+                ohiLogic.config!.VoiceTextType = "ReazonSpeech";
                 ohiLogic.writeConfig();
             }
             catch (Exception ex)
@@ -376,7 +449,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VoiceTextPort = txtVoiceTextPort.Text;
+                ohiLogic.config!.VoiceTextPort = txtVoiceTextPort.Text;
                 ohiLogic.writeConfig();
                 lblWhisperStatus.Content = ohiLogic.whisperCheck();
             }
@@ -412,7 +485,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VoiceTextWhisperModel = (string)((ComboBoxItem)cmbWhisperModel.SelectedItem).Content;
+                ohiLogic.config!.VoiceTextWhisperModel = (string)((ComboBoxItem)cmbWhisperModel.SelectedItem).Content;
                 ohiLogic.writeConfig();
                 lblWhisperStatus.Content = ohiLogic.whisperCheck();
             }
@@ -445,11 +518,39 @@ namespace Ohitorisama
             }
         }
         // ChatGPT
+        private void txtChatGptApiKey_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptApiKey = txtChatGptApiKey.Password;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void cmbChatGptPreset_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptPreset = (string)((ContentControl)cmbChatGptPreset.SelectedItem).Content;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+                ohiLogic.chatGptPreset();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+
         private void txtChatGptModel_TextChanged(object sender, TextChangedEventArgs e)
         {
             try
             {
-                ohiLogic.config.ChatGptModel = txtChatGptModel.Text;
+                ohiLogic.config!.ChatGptModel = txtChatGptModel.Text;
                 ohiLogic.writeConfig();
                 lblChatGptStatus.Content = ohiLogic.chatGptCheck();
             }
@@ -462,7 +563,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.ChatGptTotalToken = txtChatGptTotalToken.Text;
+                ohiLogic.config!.ChatGptTotalToken = txtChatGptTotalToken.Text;
                 ohiLogic.writeConfig();
                 lblChatGptStatus.Content = ohiLogic.chatGptCheck();
             }
@@ -475,7 +576,85 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.ChatGptMaxTokens= txtChatGptMaxTokens.Text;
+                ohiLogic.config!.ChatGptMaxTokens= txtChatGptMaxTokens.Text;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void txtChatGptTopP_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptTopP = txtChatGptTopP.Text;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void txtChatGptFrequencyPenalty_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptFrequencyPenalty = txtChatGptFrequencyPenalty.Text;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void txtChatGptPresencePenalty_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptPresencePenalty = txtChatGptPresencePenalty.Text;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void txtChatGptMe_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptMe = txtChatGptMe.Text;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void txtChatGptAi_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptAi = txtChatGptAi.Text;
+                ohiLogic.writeConfig();
+                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
+            }
+            catch (Exception ex)
+            {
+                WriteLog(ex.Message);
+            }
+        }
+        private void txtChatGptStop_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                ohiLogic.config!.ChatGptStop = txtChatGptStop.Text;
                 ohiLogic.writeConfig();
                 lblChatGptStatus.Content = ohiLogic.chatGptCheck();
             }
@@ -488,20 +667,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.ChatGptTemperature = txtChatGptTemperature.Text;
-                ohiLogic.writeConfig();
-                lblChatGptStatus.Content = ohiLogic.chatGptCheck();
-            }
-            catch (Exception ex)
-            {
-                WriteLog(ex.Message);
-            }
-        }
-        private void txtChatGptApiKey_PasswordChanged(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                ohiLogic.config.ChatGptApiKey = txtChatGptApiKey.Password;
+                ohiLogic.config!.ChatGptTemperature = txtChatGptTemperature.Text;
                 ohiLogic.writeConfig();
                 lblChatGptStatus.Content = ohiLogic.chatGptCheck();
             }
@@ -526,7 +692,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VoiceVoxPort = txtVoiceVoxPort.Text;
+                ohiLogic.config!.VoiceVoxPort = txtVoiceVoxPort.Text;
                 ohiLogic.writeConfig();
                 lblVoiceVoxStatus.Content = ohiLogic.voicevoxCheck();
             }
@@ -539,7 +705,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VoiceVoxSpeaker = txtVoiceVoxSpeaker.Text;
+                ohiLogic.config!.VoiceVoxSpeaker = txtVoiceVoxSpeaker.Text;
                 ohiLogic.writeConfig();
                 lblVoiceVoxStatus.Content = ohiLogic.voicevoxCheck();
             }
@@ -564,7 +730,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VTubeStudioOn = rdoVTubeStudioOn.IsChecked == true;
+                ohiLogic.config!.VTubeStudioOn = rdoVTubeStudioOn.IsChecked == true;
                 ohiLogic.writeConfig();
                 await ohiLogic.vTubeStudioKeep();
             }
@@ -577,7 +743,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VTubeStudioOn = rdoVTubeStudioOn.IsChecked == true;
+                ohiLogic.config!.VTubeStudioOn = rdoVTubeStudioOn.IsChecked == true;
                 ohiLogic.writeConfig();
             }
             catch (Exception ex)
@@ -589,7 +755,7 @@ namespace Ohitorisama
         {
             try
             {
-                ohiLogic.config.VTubeStudioPort = txtVTubeStudioPort.Text;
+                ohiLogic.config!.VTubeStudioPort = txtVTubeStudioPort.Text;
                 ohiLogic.writeConfig();
                 lblVTubeStudioStatus.Content = ohiLogic.vTubeStudioCheck();
             }

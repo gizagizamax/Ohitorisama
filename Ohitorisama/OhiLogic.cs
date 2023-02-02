@@ -16,12 +16,14 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using Ohitorisama.VTubeStudio;
 using System.Diagnostics;
+using static System.Net.Mime.MediaTypeNames;
+using System.Windows.Documents;
 
 namespace Ohitorisama
 {
     public class OhiLogic
     {
-        public OhiConfig config;
+        public OhiConfig? config;
         public KeysConverter keysConverter;
 
         static HttpClient httpClient;
@@ -32,8 +34,8 @@ namespace Ohitorisama
         Dictionary<int, bool> lastKeyCode;
         WaveInEvent? waveIn;
         List<OpenAICompletionHistory> chatGptHistoryList;
-        ClientWebSocket vtsSocket;
-        HotkeysInCurrentModelResponse hotkeysInCurrentModelResponse;
+        ClientWebSocket? vtsSocket;
+        HotkeysInCurrentModelResponse? hotkeysInCurrentModelResponse;
         string vtsHotkeyName;
 
         static OhiLogic()
@@ -72,9 +74,14 @@ namespace Ohitorisama
         // キーボード
         public string keyboardCheck()
         {
-            if (config.KeyboardTrigger == "")
+            if (config!.KeyboardTrigger == "")
             {
                 return "キーボードを選択してください。";
+            }
+
+            if (config!.KeyboardTrigger == config!.KeyboardSkip)
+            {
+                return "録音開始キーと録音スキップキーは別々のキーにしてください。";
             }
             return "OK";
         }
@@ -87,7 +94,7 @@ namespace Ohitorisama
             }
             lastKeyCode.Add(keyCode, true);
 
-            if (mainWindow.rdoKeyboardTrigger.IsChecked == true && keyCode.ToString() == config.KeyboardTrigger)
+            if (mainWindow.rdoKeyboardTrigger.IsChecked == true && keyCode.ToString() == config!.KeyboardTrigger)
             {
                 recordStart();
             }
@@ -95,32 +102,94 @@ namespace Ohitorisama
         public async Task keyboardTriggerEnd(int keyCode)
         {
             lastKeyCode.Remove(keyCode);
-            if (mainWindow.rdoKeyboardTrigger.IsChecked == true && keyCode.ToString() == config.KeyboardTrigger)
+            if (mainWindow.rdoKeyboardTrigger.IsChecked == false)
             {
-                recordEnd();
+                return;
+            }
 
-                var prompt = await whisperTranscribe();
-                saveWhisperText(prompt);
-
-                var text = await chatGptCompletion(prompt, true);
-                if (text == null)
+            if (keyCode.ToString() == config!.KeyboardTrigger || keyCode.ToString() == config!.KeyboardSkip)
+            {
+                string? prompt;
+                if (keyCode.ToString() == config!.KeyboardTrigger)
                 {
-                    text = "ううーん";
+                    recordEnd();
+
+                    prompt = await whisperTranscribe();
+                    saveWhisperText(prompt);
+                }
+                else
+                {
+                    prompt = null;
                 }
 
-                await voicevoxSpeek(text);
-                writeChatGptLog(text);
-
-                if (config.VTubeStudioOn)
+                var waveOut = new WaveOut();
+                var isPlaying = new bool[] { false };
+                waveOut.PlaybackStopped += (object? sender, StoppedEventArgs e) =>
                 {
-                    await getMotion();
+                    OpenAICompletionHistory? history = null;
+                    for (var i = 0; i <  chatGptHistoryList.Count;i++)
+                    {
+                        history = chatGptHistoryList[i];
+                        if (history.waveList!.Count - 1 > history.playedSeq)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            history = null;
+                        }
+                    }
+                    if (history == null)
+                    {
+                        isPlaying[0] = false;
+                    }
+                    else
+                    {
+                        waveOut.Init(history.waveList![history.playedSeq+1]);
+                        waveOut.Play();
+                        history.playedSeq++;
+
+                        if (history.playedSeq == 0)
+                        {
+                            writeChatGptLog(history.openAICompletionRes!.choices![0].text!);
+                        }
+                    }
+                };
+
+                var isContinueText = true;
+                var promptContinue = prompt;
+                OpenAICompletionHistory? history = null;
+                while (isContinueText)
+                {
+                    history = await chatGptCompletion(promptContinue, true);
+                    if (history == null)
+                    {
+                        isContinueText = false;
+                    }
+                    else
+                    {
+                        await voicevoxSpeek2(history, waveOut, isPlaying);
+
+                        // セリフの途中だったら続きをリクエストする
+                        isContinueText = Regex.IsMatch(history.openAICompletionRes!.choices![0].text!, "[.?!。？！]$") == false;
+                        promptContinue = null;
+                    }
+                }
+
+                if (history != null)
+                {
+                    // OpenAIに負荷がかかるので、モーションは最初のセリフにだけ適応する
+                    if (config.VTubeStudioOn)
+                    {
+                        await getMotion();
+                    }
                 }
             }
         }
         // マイク
         public string mickCheck()
         {
-            if (config.MicProductName == "")
+            if (config!.MicProductName == "")
             {
                 return "マイクを選択してください。";
             }
@@ -166,7 +235,7 @@ namespace Ohitorisama
             waveIn.DeviceNumber = deviceNumber;
             waveIn.WaveFormat = new WaveFormat(44100, WaveIn.GetCapabilities(deviceNumber).Channels);
 
-            waveWriter = new WaveFileWriter(config.MicRecordPath, waveIn.WaveFormat);
+            waveWriter = new WaveFileWriter(config!.MicRecordPath, waveIn.WaveFormat);
 
             waveIn.DataAvailable += (_, ee) =>
             {
@@ -199,7 +268,7 @@ namespace Ohitorisama
         // Whisper
         public string whisperCheck()
         {
-            if (!int.TryParse(config.VoiceTextPort, out var whisperPort))
+            if (!int.TryParse(config!.VoiceTextPort, out var whisperPort))
             {
                 return "localhostのポートに数字を入力してください";
             }
@@ -209,9 +278,9 @@ namespace Ohitorisama
         {
             var p = new Process();
             p.StartInfo.FileName = @".\OhiVoiceText\OhiVoiceText.bat";
-            p.StartInfo.ArgumentList.Add(config.VoiceTextPort);
-            p.StartInfo.ArgumentList.Add(config.VoiceTextType);
-            p.StartInfo.ArgumentList.Add(config.VoiceTextWhisperModel);
+            p.StartInfo.ArgumentList.Add(config!.VoiceTextPort!);
+            p.StartInfo.ArgumentList.Add(config!.VoiceTextType!);
+            p.StartInfo.ArgumentList.Add(config!.VoiceTextWhisperModel!);
             p.Start();
         }
         public async void voiceTextReload()
@@ -219,7 +288,7 @@ namespace Ohitorisama
             mainWindow.WriteLog("voiceText server reload start.");
 
             var data = new Dictionary<string, string>();
-            data.Add("model", config.VoiceTextWhisperModel);
+            data.Add("model", config!.VoiceTextWhisperModel!);
 
             var response = await httpClient.GetAsync($"http://localhost:{config.VoiceTextPort}/reload?{await new FormUrlEncodedContent(data).ReadAsStringAsync()}");
             mainWindow.WriteLog(string.Format("{0}", response));
@@ -237,7 +306,7 @@ namespace Ohitorisama
             mainWindow.WriteLog("whisper transcribe start.");
 
             var whisperParam = new Dictionary<string, string>();
-            whisperParam.Add("path", config.MicRecordPath);
+            whisperParam.Add("path", config!.MicRecordPath!);
 
             var response = await httpClient.GetAsync($"http://localhost:{config.VoiceTextPort}/get_msg?{await new FormUrlEncodedContent(whisperParam).ReadAsStringAsync()}");
             mainWindow.WriteLog(string.Format("{0}", response));
@@ -245,15 +314,15 @@ namespace Ohitorisama
             var strJson = await response.Content.ReadAsStringAsync();
 
             var voiceTextGetMsgRes = JsonSerializer.Deserialize<VoiceTextGetMsgRes>(strJson);
-            mainWindow.WriteLog($"whisper transcribe success. {voiceTextGetMsgRes.text}");
-            return voiceTextGetMsgRes.text;
+            mainWindow.WriteLog($"whisper transcribe success. {voiceTextGetMsgRes!.text}");
+            return voiceTextGetMsgRes.text!;
         }
         public async Task<string> reazonSpeechLoad()
         {
             mainWindow.WriteLog("ReazonSpeech load start.");
 
             var reazonSpeechParam = new Dictionary<string, string>();
-            reazonSpeechParam.Add("path", config.MicRecordPath);
+            reazonSpeechParam.Add("path", config!.MicRecordPath!);
 
             var response = await httpClient.GetAsync($"http://localhost:{config.VoiceTextPort}/get_msg?{await new FormUrlEncodedContent(reazonSpeechParam).ReadAsStringAsync()}");
             mainWindow.WriteLog(string.Format("{0}", response));
@@ -261,8 +330,8 @@ namespace Ohitorisama
             var strJson = await response.Content.ReadAsStringAsync();
 
             var voiceTextGetMsgRes = JsonSerializer.Deserialize<VoiceTextGetMsgRes>(strJson);
-            mainWindow.WriteLog($"eazonSpeech load  success. {voiceTextGetMsgRes.text}");
-            return voiceTextGetMsgRes.text;
+            mainWindow.WriteLog($"eazonSpeech load  success. {voiceTextGetMsgRes!.text}");
+            return voiceTextGetMsgRes.text!;
         }
         void saveWhisperText(string text)
         {
@@ -276,53 +345,155 @@ namespace Ohitorisama
         // ChatGPT
         public string chatGptCheck()
         {
+            if (config!.ChatGptApiKey == "")
+            {
+                return "APIキーを入力してください。";
+            }
             if (config.ChatGptModel == "")
             {
-                return "モデルを入力してください。";
+                return "modelを入力してください。";
             }
             if (!int.TryParse(config.ChatGptTotalToken, out var chatGptTotalToken))
             {
-                return "totaltokenに数字を入力してください。";
-            }
-            if (!int.TryParse(config.ChatGptMaxTokens, out var chatGptMaxTokens))
-            {
-                return "max_tokensに数字(MAX2048)を入力してください。";
+                return "total_tokenに数字を入力してください。";
             }
             if (!float.TryParse(config.ChatGptTemperature, out var chatGptTemperature))
             {
                 return "temperatureに数字(0.0～1.0)を入力してください。";
             }
-            if (config.ChatGptApiKey == "")
+            if (!int.TryParse(config.ChatGptMaxTokens, out var chatGptMaxTokens))
             {
-                return "APIキーを入力してください。";
+                return "max_tokensに数字(MAX2048)を入力してください。";
+            }
+            if (!float.TryParse(config.ChatGptTopP, out var chatGptTopP))
+            {
+                return "top_pに数字(0.0～1.0)を入力してください。";
+            }
+            if (!float.TryParse(config.ChatGptFrequencyPenalty, out var chatGptFrequencyPenalty))
+            {
+                return "frequency__penaltyに数字(0.0～1.0)を入力してください。";
+            }
+            if (!float.TryParse(config.ChatGptPresencePenalty, out var chatGptPresencePenalty))
+            {
+                return "presence__penaltyに数字(0.0～1.0)を入力してください。";
+            }
+            if (config.ChatGptAi == "")
+            {
+                return "一人称(自分)を入力してください。";
+            }
+            if (config.ChatGptMe == "")
+            {
+                return "一人称(AI)を入力してください。";
             }
             return "OK";
         }
-        public async Task<string> chatGptCompletion(string prompt, bool logFlg)
+        public void chatGptPreset()
+        {
+            if (mainWindow.cmbChatGptPreset.SelectedItem == mainWindow.cbiChatGptPresetEmpty)
+            {
+                // 特に何もしない
+                return;
+            }
+
+            if (mainWindow.cmbChatGptPreset.SelectedItem == mainWindow.cbiChatGptPresetFriend)
+            {
+                mainWindow.txtChatGptModel.Text = "text-davinci-003";
+                mainWindow.txtChatGptTotalToken.Text = "4000";
+                mainWindow.txtChatGptTemperature.Text = "0.5";
+                mainWindow.txtChatGptMaxTokens.Text = "60";
+                mainWindow.txtChatGptTopP.Text = "1.0";
+                mainWindow.txtChatGptFrequencyPenalty.Text = "0.5";
+                mainWindow.txtChatGptPresencePenalty.Text = "0.0";
+                mainWindow.txtChatGptMe.Text = "You";
+                mainWindow.txtChatGptAi.Text = "Friend";
+                mainWindow.txtChatGptStop.Text = "You";
+                return;
+            }
+
+            if (mainWindow.cmbChatGptPreset.SelectedItem == mainWindow.cbiChatGptPresetChat)
+            {
+                mainWindow.txtChatGptModel.Text = "text-davinci-003";
+                mainWindow.txtChatGptTotalToken.Text = "4000";
+                mainWindow.txtChatGptTemperature.Text = "0.9";
+                mainWindow.txtChatGptMaxTokens.Text = "150";
+                mainWindow.txtChatGptTopP.Text = "1.0";
+                mainWindow.txtChatGptFrequencyPenalty.Text = "0.0";
+                mainWindow.txtChatGptPresencePenalty.Text = "0.6";
+                mainWindow.txtChatGptMe.Text = "Human";
+                mainWindow.txtChatGptAi.Text = "AI";
+                mainWindow.txtChatGptStop.Text = "Human,AI";
+                return;
+            }
+
+            if (mainWindow.cmbChatGptPreset.SelectedItem == mainWindow.cbiChatGptPresetMarv)
+            {
+                mainWindow.txtChatGptModel.Text = "text-davinci-003";
+                mainWindow.txtChatGptTotalToken.Text = "4000";
+                mainWindow.txtChatGptTemperature.Text = "0.5";
+                mainWindow.txtChatGptMaxTokens.Text = "60";
+                mainWindow.txtChatGptTopP.Text = "0.3";
+                mainWindow.txtChatGptFrequencyPenalty.Text = "0.5";
+                mainWindow.txtChatGptPresencePenalty.Text = "0.0";
+                mainWindow.txtChatGptMe.Text = "You";
+                mainWindow.txtChatGptAi.Text = "Marv";
+                mainWindow.txtChatGptStop.Text = "";
+                return;
+            }
+        }
+        public async Task<OpenAICompletionHistory?> chatGptCompletion(string? prompt, bool logFlg)
         {
             mainWindow.WriteLog(string.Format("ChatGPT completion start. prompt:{0}", prompt));
 
             var historyText = new StringBuilder();
             foreach (var history in chatGptHistoryList)
             {
-                historyText.Append("Human: " + history.new_prompt + "\nAI: " + history.openAICompletionRes.choices[0].text + "\n");
+                string mePromptNew;
+                if (history.new_prompt == null)
+                {
+                    mePromptNew = "";
+                }
+                else
+                {
+                    mePromptNew = config!.ChatGptMe + ": " + history.new_prompt + "\n";
+                }
+                historyText.Append(mePromptNew + config!.ChatGptAi + ": " + history.openAICompletionRes!.choices![0].text + "\n");
             }
+
+            string mePrompt;
+            if (prompt == null)
+            {
+                mePrompt = "";
+            }
+            else
+            {
+                mePrompt = config!.ChatGptMe + ": " + prompt + "\n";
+            }
+
+            var stopSplit = config!.ChatGptStop!.Split(",");
+            var stopList = new List<string>();
+            foreach (var stop in stopSplit)
+            {
+                stopList.Add(stop.Trim() + ":");
+            }
+
             var chatGptContent = new OpenAICompletionReq()
             {
-                model = config.ChatGptModel,
-                prompt = historyText.ToString() + "\nHuman: " + prompt + "\nAI: ",
-                max_tokens = int.Parse(config.ChatGptMaxTokens),
-                temperature = float.Parse(config.ChatGptTemperature)
+                model = config.ChatGptModel == "" ? "text-davinci-003" : config.ChatGptModel,
+                prompt = historyText.ToString() + mePrompt + config.ChatGptAi + ": ",
+                temperature = config.ChatGptTemperature == "" ? 0.5f : float.Parse(config.ChatGptTemperature!),
+                max_tokens = config.ChatGptMaxTokens == "" ? 60 : int.Parse(config.ChatGptMaxTokens!),
+                top_p = config.ChatGptTopP == "" ? 1.0f : float.Parse(config.ChatGptTopP!),
+                frequency_penalty = config.ChatGptFrequencyPenalty == "" ? 0.5f : float.Parse(config.ChatGptFrequencyPenalty!),
+                presence_penalty = config.ChatGptPresencePenalty == "" ? 0.0f : float.Parse(config.ChatGptPresencePenalty!),
+                stop = config.ChatGptStop == "" ? null : stopList.ToArray(),
             };
             for (var retry = 0; retry < 3; retry++)
             {
-                var content = chatGptContent == null ? null : new StringContent(JsonSerializer.Serialize(chatGptContent), Encoding.UTF8, "application/json");
-
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
                     RequestUri = new Uri("https://api.openai.com/v1/completions"),
-                    Content = content
+                    Content = new StringContent(JsonSerializer.Serialize(chatGptContent), Encoding.UTF8, "application/json")
                 };
                 request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", config.ChatGptApiKey);
 
@@ -333,31 +504,34 @@ namespace Ohitorisama
                 mainWindow.WriteLog(string.Format("OpenAICompletionResponse {0}", openAICompletionRes));
 
                 // 改行があると無視されるので改行は消す
-                openAICompletionRes.choices[0].text = openAICompletionRes.choices[0].text.Replace("\n", "");
-                if (openAICompletionRes.choices[0].text.Replace("！", "").Replace("!", "").Replace("？", "").Replace("?", "") == "")
+                openAICompletionRes!.choices![0].text = openAICompletionRes.choices[0].text!.Replace("\n", "");
+                if (openAICompletionRes.choices[0].text!.Replace("！", "").Replace("!", "").Replace("？", "").Replace("?", "") == "")
                 {
                     // 発音する言葉が無かったらリトライ
                     continue;
                 }
 
+                // 成功
+                var history = new OpenAICompletionHistory();
+                history.new_prompt = prompt;
+                history.new_token =
+                    chatGptHistoryList.Count() == 0 ?
+                    openAICompletionRes.usage!.prompt_tokens :
+                    openAICompletionRes.usage!.prompt_tokens - chatGptHistoryList[chatGptHistoryList.Count() - 1].openAICompletionRes!.usage!.total_tokens;
+                history.openAICompletionRes = openAICompletionRes;
+                history.waveList = new List<IWaveProvider>();
+                history.playedSeq = -1;
+
                 if (logFlg)
                 {
-                    // 成功
-                    var history = new OpenAICompletionHistory();
-                    history.new_prompt = prompt;
-                    history.new_token =
-                        chatGptHistoryList.Count() == 0 ?
-                        openAICompletionRes.usage.prompt_tokens :
-                        openAICompletionRes.usage.prompt_tokens - chatGptHistoryList[chatGptHistoryList.Count() - 1].openAICompletionRes.usage.total_tokens;
-                    history.openAICompletionRes = openAICompletionRes;
                     chatGptHistoryList.Add(history);
 
                     // tokenが限界を超えそうなら忘れさせる
                     int total_tokens = 0;
                     for (var i = chatGptHistoryList.Count - 1; 0 <= i; i--)
                     {
-                        total_tokens += chatGptHistoryList[i].openAICompletionRes.usage.total_tokens;
-                        if (total_tokens > int.Parse(config.ChatGptTotalToken) - int.Parse(config.ChatGptMaxTokens))
+                        total_tokens += chatGptHistoryList[i].openAICompletionRes!.usage!.total_tokens;
+                        if (total_tokens > int.Parse(config.ChatGptTotalToken!) - int.Parse(config.ChatGptMaxTokens!))
                         {
                             chatGptHistoryList.RemoveRange(0, i);
                             break;
@@ -367,11 +541,11 @@ namespace Ohitorisama
 
                 mainWindow.WriteLog(string.Format("ChatGPT completion success. text:{0}", openAICompletionRes.choices[0].text));
 
-                return openAICompletionRes.choices[0].text;
+                return history;
             }
 
             mainWindow.WriteLog("ChatGPT completion failed. text:''");
-            return "";
+            return null;
         }
 
         void writeChatGptLog(string text)
@@ -390,7 +564,7 @@ namespace Ohitorisama
         // Voicevox
         public string voicevoxCheck()
         {
-            if (!int.TryParse(config.VoiceVoxPort, out var voicevoxPort))
+            if (!int.TryParse(config!.VoiceVoxPort, out var voicevoxPort))
             {
                 return "ポートに数字を入力してください。";
             }
@@ -402,18 +576,22 @@ namespace Ohitorisama
         }
         public async Task voicevoxSpeek(string text)
         {
+            // 頭に句読点があると全く読まれなくなるため消す
+            string textReplace = Regex.Replace(text, "^[.,?!。、？！]*", "");
+
+
             // VOICEVOXに長文を送ると遅いので、キリのいい所で切る。話してる間に後半を処理することで待ち時間を減らす
-            var endIndex = text.IndexOf("。");
+            var endIndex = textReplace.IndexOf("。");
             string line1st;
-            string line2nd;
+            string? line2nd;
             if (endIndex >= 0)
             {
-                line1st = text.Substring(0, endIndex + 1);
-                line2nd = text.Substring(endIndex + 1, text.Length - endIndex - 1);
+                line1st = textReplace.Substring(0, endIndex + 1);
+                line2nd = textReplace.Substring(endIndex + 1, textReplace.Length - endIndex - 1);
             }
             else
             {
-                line1st = text;
+                line1st = textReplace;
                 line2nd = null;
             }
 
@@ -439,13 +617,71 @@ namespace Ohitorisama
 
             mainWindow.WriteLog("VoiceVox success.");
         }
+        public async Task voicevoxSpeek2(OpenAICompletionHistory history, WaveOut waveOut, bool[] isPlaying)
+        {
+            // 頭に句読点があると全く読まれなくなるため消す
+            string textReplace = Regex.Replace(history.openAICompletionRes!.choices![0].text!, "$[.,?1。、？！]*", "");
+
+            // VOICEVOXに長文を送ると遅いので、キリのいい所で切る。話してる間に後半を処理することで待ち時間を減らす
+            string line1st;
+            string? line2nd;
+            if (isPlaying[0])
+            {
+                line1st = textReplace;
+                line2nd = null;
+            }
+            else
+            {
+                var endIndex = textReplace.IndexOf("。");
+                if (endIndex >= 0)
+                {
+                    line1st = textReplace.Substring(0, endIndex + 1);
+                    line2nd = textReplace.Substring(endIndex + 1, textReplace.Length - endIndex - 1);
+                }
+                else
+                {
+                    line1st = textReplace;
+                    line2nd = null;
+                }
+
+            }
+
+            var byteSynthesis1st = await voicevoxSynthesis(line1st);
+            history.waveList!.Add(new RawSourceWaveStream(new MemoryStream(byteSynthesis1st), new WaveFormat(24000, 1)));
+
+            if (!isPlaying[0])
+            {
+                waveOut.Init(history.waveList![history.playedSeq + 1]);
+                waveOut.Play();
+                history.playedSeq++;
+                isPlaying[0] = true;
+
+                writeChatGptLog(history.openAICompletionRes!.choices![0].text!);
+            }
+
+            if (line2nd != null)
+            {
+                var byteSynthesis2nd = await voicevoxSynthesis(line2nd);
+                history.waveList!.Add(new RawSourceWaveStream(new MemoryStream(byteSynthesis2nd), new WaveFormat(24000, 1)));
+
+                if (!isPlaying[0])
+                {
+                    waveOut.Init(history.waveList![history.playedSeq + 1]);
+                    waveOut.Play();
+                    history.playedSeq++;
+                    isPlaying[0] = true;
+                }
+            }
+
+            mainWindow.WriteLog("VoiceVox success.");
+        }
         async Task<byte[]> voicevoxSynthesis(string text)
         {
             mainWindow.WriteLog("VoiceVox start.");
 
             var urlParam = new Dictionary<string, string>();
             urlParam.Add("text", text);
-            urlParam.Add("speaker", config.VoiceVoxSpeaker);
+            urlParam.Add("speaker", config!.VoiceVoxSpeaker!);
             var strUrlParam = await new FormUrlEncodedContent(urlParam).ReadAsStringAsync();
 
             var requestAudioQuery = new HttpRequestMessage
@@ -476,15 +712,15 @@ namespace Ohitorisama
             mainWindow.WriteLog("ChatGPT completion getMotion start.");
 
             List<string> hotkeyNameList = new List<string>();
-            foreach (var availableHotkey in hotkeysInCurrentModelResponse.data.availableHotkeys)
+            foreach (var availableHotkey in hotkeysInCurrentModelResponse!.data!.availableHotkeys!)
             {
-                hotkeyNameList.Add(availableHotkey.name);
+                hotkeyNameList.Add(availableHotkey.name!);
             }
 
-            var text = await chatGptCompletion("その時の気持ちとして、最も適している物は次のうちどれですか。" + string.Join("、", hotkeyNameList.ToArray()), false);
+            var history = await chatGptCompletion("その時の気持ちとして、最も適している物は次のうちどれですか。" + string.Join("、", hotkeyNameList.ToArray()), false);
 
             // 動作を抽出
-            Match matche = Regex.Match(text, string.Join("|", hotkeyNameList.ToArray()));
+            Match matche = Regex.Match(history!.openAICompletionRes!.choices![0].text!, string.Join("|", hotkeyNameList.ToArray()));
             var motion = matche.Value;
 
             mainWindow.WriteLog(string.Format("ChatGPT completion getMotion success. motion:{0}", motion));
@@ -493,7 +729,7 @@ namespace Ohitorisama
         // VTubeStudio
         public string vTubeStudioCheck()
         {
-            if (!int.TryParse(config.VTubeStudioPort, out var vTubeStudioPort))
+            if (!int.TryParse(config!.VTubeStudioPort, out var vTubeStudioPort))
             {
                 return "ポートに数字を入力してください。";
             }
@@ -501,7 +737,7 @@ namespace Ohitorisama
         }
         public async Task vTubeStudioKeep()
         {
-            if (config.VTubeStudioOn && mainWindow.rdoKeyboardTrigger.IsChecked == true)
+            if (config!.VTubeStudioOn && mainWindow.rdoKeyboardTrigger.IsChecked == true)
             {
                 await vTubeStudioConnect();
             }
@@ -527,18 +763,18 @@ namespace Ohitorisama
             await vTubeStudioConnect();
 
             await vTubeStudioHotkey();
-            foreach (var availableHotkey in hotkeysInCurrentModelResponse.data.availableHotkeys)
+            foreach (var availableHotkey in hotkeysInCurrentModelResponse!.data!.availableHotkeys!)
             {
-                await vTubeStudioTrigger(availableHotkey.name);
+                await vTubeStudioTrigger(availableHotkey.name!);
                 await Task.Delay(1000);
-                await vTubeStudioTrigger(availableHotkey.name);
+                await vTubeStudioTrigger(availableHotkey.name!);
                 await Task.Delay(1000);
             }
         }
         async Task vTubeStudioConnect()
         {
             vtsSocket = new ClientWebSocket();
-            await vtsSocket.ConnectAsync(new Uri("ws://localhost:" + config.VTubeStudioPort), CancellationToken.None);
+            await vtsSocket.ConnectAsync(new Uri("ws://localhost:" + config!.VTubeStudioPort), CancellationToken.None);
 
             var bmp = new Bitmap(this.GetType(), "VTubeStudio.VtsPlugin.png");
             var ms = new MemoryStream();
@@ -557,7 +793,7 @@ namespace Ohitorisama
                     pluginIcon = ms.GetBuffer()
                 }
             }, true);
-            if (authenticationTokenResponse.messageType != typeof(AuthenticationTokenResponse).Name)
+            if (authenticationTokenResponse!.messageType != typeof(AuthenticationTokenResponse).Name)
             {
                 return;
             }
@@ -572,10 +808,10 @@ namespace Ohitorisama
                 {
                     pluginName = "Ohitorisama Plugin",
                     pluginDeveloper = "おひとり様連携用プラグイン",
-                    authenticationToken = authenticationTokenResponse.data.authenticationToken
+                    authenticationToken = authenticationTokenResponse.data!.authenticationToken
                 }
             }, true);
-            if (authenticationResponse.messageType != typeof(AuthenticationResponse).Name)
+            if (authenticationResponse!.messageType != typeof(AuthenticationResponse).Name)
             {
                 return;
             }
@@ -589,7 +825,7 @@ namespace Ohitorisama
                 requestID = $"ohitorisama {typeof(CurrentModelRequest).Name}",
                 messageType = typeof(CurrentModelRequest).Name
             }, false);
-            if (currentModelResponse.messageType != typeof(CurrentModelResponse).Name)
+            if (currentModelResponse!.messageType != typeof(CurrentModelResponse).Name)
             {
                 return;
             }
@@ -602,10 +838,10 @@ namespace Ohitorisama
                 messageType = typeof(HotkeysInCurrentModelRequest).Name,
                 data = new HotkeysInCurrentModelRequest.Data()
                 {
-                    modelID = currentModelResponse.data.modelID
+                    modelID = currentModelResponse.data!.modelID
                 }
             }, false);
-            if (hotkeysInCurrentModelResponse.messageType != typeof(HotkeysInCurrentModelResponse).Name)
+            if (hotkeysInCurrentModelResponse!.messageType != typeof(HotkeysInCurrentModelResponse).Name)
             {
                 return;
             }
@@ -613,8 +849,8 @@ namespace Ohitorisama
         }
         async Task vTubeStudioTrigger(string hotkeyName)
         {
-            string hotkeyId = null;
-            foreach (var availableHotkey in this.hotkeysInCurrentModelResponse.data.availableHotkeys)
+            string? hotkeyId = null;
+            foreach (var availableHotkey in this.hotkeysInCurrentModelResponse!.data!.availableHotkeys!)
             {
                 if (availableHotkey.name == hotkeyName)
                 {
@@ -642,9 +878,9 @@ namespace Ohitorisama
                 }, true);
             }
         }
-        async Task<T> vTubeStudioCall<T>(object arg, bool isWriteLog)
+        async Task<T?> vTubeStudioCall<T>(object arg, bool isWriteLog)
         {
-            await vtsSocket.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(arg)), WebSocketMessageType.Text, true, CancellationToken.None);
+            await vtsSocket!.SendAsync(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(arg)), WebSocketMessageType.Text, true, CancellationToken.None);
 
             List<byte> byteList = new List<byte>();
             WebSocketReceiveResult result;

@@ -17,7 +17,7 @@ namespace Ohitorisama
             public int completion_tokens { get; set; }
             public int total_tokens { get; set; }
         }
-        public string id { get; set; }
+        public string? id { get; set; }
         public long created { get; set; }
         public string? model { get; set; }
         public List<Choice>? choices { get; set; }

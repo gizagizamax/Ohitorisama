@@ -176,4 +176,7 @@ hoge
 
 # 使い方
 
+ChatGPTのプリセット設定値
+https://beta.openai.com/examples/default-friend-chat
+
 hoge

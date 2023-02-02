@@ -1,0 +1,67 @@
+@charset "utf-8";
+.line-bc {
+    text-align: right;
+    font-size: 25px;
+  }
+  
+  /*以下、②左側のコメント*/
+  .balloon6 {
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .balloon6 .chatting {
+    width: 100%;
+    text-align: left;
+  }
+  .says {
+    display: inline-block;
+    position: relative; 
+    margin: 10px 0 0 20px;
+    padding: 10px;
+    max-width: 80%;
+    border-radius: 12px;
+    background: #edf1ee;
+  }
+  
+  .says:after {
+    content: "";
+    display: inline-block;
+    position: absolute;
+    top: 3px; 
+    left: -19px;
+    border: 8px solid transparent;
+    border-right: 18px solid #edf1ee;
+    -webkit-transform: rotate(35deg);
+    transform: rotate(35deg);
+  }
+  .says p {
+    margin: 0;
+    padding: 0;
+  }
+  
+  /*以下、③右側の緑コメント*/
+  .mycomment {
+    margin: 10px 0;
+  }
+  .mycomment p {
+    display: inline-block;
+    position: relative; 
+    margin: 0 10px 0 0;
+    padding: 8px;
+    max-width: 80%;
+    border-radius: 12px;
+    background: #30e852;
+    font-size: 25px;
+  }
+  
+  .mycomment p:after {
+    content: "";
+    position: absolute;
+    top: 3px; 
+    right: -19px;
+    border: 8px solid transparent;
+    border-left: 18px solid #30e852;
+    -webkit-transform: rotate(-35deg);
+    transform: rotate(-35deg);
+  }

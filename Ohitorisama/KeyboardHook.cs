@@ -50,7 +50,7 @@ namespace Ohitorisama
 
         private delegate IntPtr KeyboardProc(int nCode, IntPtr wParam, IntPtr lParam);
 
-        private KeyboardProc proc;
+        private KeyboardProc? proc;
         private IntPtr hookId = IntPtr.Zero;
 
         public void Hook()
@@ -60,9 +60,9 @@ namespace Ohitorisama
                 proc = HookProcedure;
                 using (var curProcess = Process.GetCurrentProcess())
                 {
-                    using (ProcessModule curModule = curProcess.MainModule)
+                    using (ProcessModule curModule = curProcess.MainModule!)
                     {
-                        hookId = SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(curModule.ModuleName), 0);
+                        hookId = SetWindowsHookEx(WH_KEYBOARD_LL, proc, GetModuleHandle(curModule.ModuleName!), 0);
                     }
                 }
             }
@@ -78,13 +78,13 @@ namespace Ohitorisama
         {
             if (nCode >= 0 && (wParam == (IntPtr)WM_KEYDOWN || wParam == (IntPtr)WM_SYSKEYDOWN))
             {
-                var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+                var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT))!;
                 var vkCode = (int)kb.vkCode;
                 OnKeyDownEvent(vkCode);
             }
             else if (nCode >= 0 && (wParam == (IntPtr)WM_KEYUP || wParam == (IntPtr)WM_SYSKEYUP))
             {
-                var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT));
+                var kb = (KBDLLHOOKSTRUCT)Marshal.PtrToStructure(lParam, typeof(KBDLLHOOKSTRUCT))!;
                 var vkCode = (int)kb.vkCode;
                 OnKeyUpEvent(vkCode);
             }
@@ -92,8 +92,8 @@ namespace Ohitorisama
         }
 
         public delegate void KeyEventHandler(object sender, KeyEventArg e);
-        public event KeyEventHandler KeyDownEvent;
-        public event KeyEventHandler KeyUpEvent;
+        public event KeyEventHandler? KeyDownEvent;
+        public event KeyEventHandler? KeyUpEvent;
 
         protected void OnKeyDownEvent(int keyCode)
         {

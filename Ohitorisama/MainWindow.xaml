@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Ohitorisama"
         mc:Ignorable="d"
-        Title="おひとり様" Height="450" Width="673" Closing="Window_Closing">
+        Title="おひとり様" Height="516" Width="673" Closing="Window_Closing">
     <StackPanel>
         <StackPanel>
             <TabControl>
@@ -19,19 +19,26 @@
                         <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
                             <RadioButton x:Name="rdoKeyboardTrigger" Content="ON" Margin="5,5,5,0" Checked="rdoKeyboardTrigger_Checked"/>
                             <RadioButton Content="OFF" Margin="5,5,5,0" IsChecked="True"/>
-                            <Label Content="使わない時はOFFにしておくことで、予期せぬタイミングで会話してしまうのを防げます。" Margin="5,0,5,0"/>
+                            <Label Content="ONにすると開始します。使わない時はOFFにしておいてください。" Margin="5,0,5,0"/>
                         </StackPanel>
                         <StackPanel Margin="0,0,0,5">
                             <Label Content="音声認識サーバーの起動を忘れないようにしてください。" Margin="5,0,5,0"/>
-                            <Label Content="ONにするとVTubeStudioに接続します。" Margin="5,0,5,0"/>
+                            <Label Content="VTubeStudioがONの時に、キーボードをONにするとVTubeStudioに接続します。" Margin="5,0,5,0"/>
                         </StackPanel>
-                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
-                            <Label Content="キーボード" Margin="5,0,5,0"/>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Label Content="録音開始キー" Margin="5,0,5,0"/>
                             <ComboBox x:Name="cmbKeyboardTrigger" Width="150" Margin="5,0,5,0" SelectionChanged="cmbKeyboardTrigger_SelectionChanged"/>
                         </StackPanel>
                         <StackPanel Margin="0,0,0,5">
-                            <Label Content="このキーを押してる間、録音されます。" Margin="5,0,5,0" FontSize="11"/>
+                            <Label Content="このキーを押すと録音が開始し、離すと録音を終了します。" Margin="5,0,5,0" FontSize="11"/>
                             <Label Content="録音した音声を使ってAIと会話をします。" Margin="5,0,5,0" FontSize="11"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Label Content="録音スキップキー" Margin="5,0,5,0"/>
+                            <ComboBox x:Name="cmbKeyboardSkip" Width="150" Margin="5,0,5,0" SelectionChanged="cmbKeyboardSkip_SelectionChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,5">
+                            <Label Content="このキーを押すと人が話さなくてもAIが話します。" Margin="5,0,5,0" FontSize="11"/>
                         </StackPanel>
                     </StackPanel>
                 </TabItem>
@@ -138,22 +145,41 @@
                             <Label Content="NG" x:Name="lblChatGptStatus"/>
                         </StackPanel>
                         <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
-                            <Label Content="モデル" Margin="5,0,5,0"/>
-                            <TextBox x:Name="txtChatGptModel" Width="150" Margin="5,0,0,0" TextChanged="txtChatGptModel_TextChanged"/>
-                            <Label Content="デフォルト値&quot;text-davinci-003&quot;" Margin="0,0,5,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
-                            <Label Content="total_token" Margin="5,0,5,0"/>
-                            <TextBox x:Name="txtChatGptTotalToken" Width="50" Margin="5,0,0,0" TextChanged="txtChatGptTotalToken_TextChanged"/>
-                            <Label Content="&quot;text-davinci-003&quot;の場合4000、&quot;text-curie-001&quot;, &quot;text-babbage-001&quot;, &quot;text-ada-001&quot;の場合2048" Margin="0,0,5,0"/>
-                        </StackPanel>
-                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
-                            <Label Content="max__tokens" Margin="5,0,5,0"/>
-                            <TextBox x:Name="txtChatGptMaxTokens" Width="50" Margin="5,0,10,0" TextChanged="txtChatGptMaxTokens_TextChanged"/>
-                            <Label Content="temperature" Margin="5,0,5,0"/>
-                            <TextBox x:Name="txtChatGptTemperature" Width="50" Margin="5,0,5,0" TextChanged="txtChatGptTemperature_TextChanged"/>
                             <Label Content="APIキー" Margin="5,0,5,0"/>
                             <PasswordBox x:Name="txtChatGptApiKey" Width="200" Margin="5,0,5,0" PasswordChanged="txtChatGptApiKey_PasswordChanged"/>
+                            <Label Content="プリセット" Margin="5,0,5,0"/>
+                            <ComboBox x:Name="cmbChatGptPreset" Width="170" Margin="5,0,0,0" SelectionChanged="cmbChatGptPreset_SelectionChanged">
+                                <ComboBoxItem x:Name="cbiChatGptPresetEmpty" Content=""/>
+                                <ComboBoxItem x:Name="cbiChatGptPresetFriend" Content="フレンドチャット"/>
+                                <ComboBoxItem x:Name="cbiChatGptPresetChat" Content="チャット"/>
+                                <ComboBoxItem x:Name="cbiChatGptPresetMarv" Content="皮肉なチャットボットのMarv"/>
+                            </ComboBox>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="model" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptModel" Width="150" Margin="5,0,0,0" TextChanged="txtChatGptModel_TextChanged"/>
+                            <Label Content="total__token" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptTotalToken" Width="50" Margin="5,0,0,0" TextChanged="txtChatGptTotalToken_TextChanged"/>
+                            <Label Content="temperature" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptTemperature" Width="50" Margin="5,0,5,0" TextChanged="txtChatGptTemperature_TextChanged"/>
+                            <Label Content="max__tokens" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptMaxTokens" Width="50" Margin="5,0,10,0" TextChanged="txtChatGptMaxTokens_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,5" Orientation="Horizontal">
+                            <Label Content="top__p" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptTopP" Width="50" Margin="5,0,10,0" TextChanged="txtChatGptTopP_TextChanged"/>
+                            <Label Content="frequency__penalty" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptFrequencyPenalty" Width="50" Margin="5,0,10,0" TextChanged="txtChatGptFrequencyPenalty_TextChanged"/>
+                            <Label Content="presence__penalty" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptPresencePenalty" Width="50" Margin="5,0,10,0" TextChanged="txtChatGptPresencePenalty_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel Margin="0,5,0,0" Orientation="Horizontal">
+                            <Label Content="一人称(自分)" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptMe" Width="100" Margin="5,0,10,0" TextChanged="txtChatGptMe_TextChanged"/>
+                            <Label Content="一人称(AI)" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptAi" Width="100" Margin="5,0,10,0" TextChanged="txtChatGptAi_TextChanged"/>
+                            <Label Content="stop" Margin="5,0,5,0"/>
+                            <TextBox x:Name="txtChatGptStop" Width="100" Margin="5,0,10,0" TextChanged="txtChatGptStop_TextChanged"/>
                         </StackPanel>
                         <StackPanel Margin="0,5,0,0">
                             <Border BorderBrush="Black" BorderThickness="1" Height="1"/>

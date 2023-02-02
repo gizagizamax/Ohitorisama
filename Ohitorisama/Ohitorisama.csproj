@@ -29,6 +29,15 @@
     <None Update="OhiViewer\OhiChatGpt.js">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="OhiViewer\OhiViewer.css">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiViewer.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="OhiViewer\OhiViewer.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="OhiViewer\OhiVoiceText.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
